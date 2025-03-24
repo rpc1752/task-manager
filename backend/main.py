@@ -1,6 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import uuid
+import os
 from urllib.parse import parse_qs, urlparse
 
 # Task model as a simple Python class
@@ -41,6 +42,10 @@ class TaskHandler(BaseHTTPRequestHandler):
             self._set_headers()
             tasks_json = json.dumps([task.to_dict() for task in tasks_db])
             self.wfile.write(tasks_json.encode())
+        elif self.path == '/':
+            # Health check endpoint
+            self._set_headers()
+            self.wfile.write(json.dumps({"status": "ok"}).encode())
         else:
             self._set_headers(404)
             self.wfile.write(json.dumps({"error": "Not found"}).encode())
@@ -82,6 +87,8 @@ class TaskHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({"error": "Not found"}).encode())
 
 def run(server_class=HTTPServer, handler_class=TaskHandler, port=8000):
+    # Use PORT environment variable if it exists (for Render deployment)
+    port = int(os.environ.get('PORT', port))
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
     print(f"Starting server on port {port}...")

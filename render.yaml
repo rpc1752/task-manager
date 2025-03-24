@@ -1,0 +1,26 @@
+services:
+  # Backend web service (Python HTTP server)
+  - type: web
+    name: task-manager-backend
+    env: python
+    buildCommand: cd backend && python -c "print('Building backend...')"
+    startCommand: cd backend && python main.py
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.0
+
+  # Frontend static site (React app)
+  - type: web
+    name: task-manager-frontend
+    env: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    envVars:
+      - key: NODE_VERSION
+        value: 16
+      - key: API_URL
+        fromService:
+          type: web
+          name: task-manager-backend
+          envVarKey: RENDER_EXTERNAL_URL

@@ -3,6 +3,12 @@ import axios from "axios";
 import TaskList from "./components/TaskList";
 import TaskForm from "./components/TaskForm";
 
+// Get the API URL from environment variables or use the local proxy
+const apiBaseUrl =
+  import.meta.env.PROD && import.meta.env.VITE_API_URL
+    ? import.meta.env.VITE_API_URL
+    : "";
+
 function App() {
   const [tasks, setTasks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -17,7 +23,7 @@ function App() {
   const fetchTasks = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get("/tasks");
+      const response = await axios.get(`${apiBaseUrl}/tasks`);
       setTasks(response.data);
       setError(null);
     } catch (err) {
@@ -31,7 +37,10 @@ function App() {
   // Function to add a new task
   const addTask = async (title) => {
     try {
-      const response = await axios.post("/tasks", { title, completed: false });
+      const response = await axios.post(`${apiBaseUrl}/tasks`, {
+        title,
+        completed: false,
+      });
       setTasks([...tasks, response.data]);
     } catch (err) {
       setError("Failed to add task");
@@ -42,7 +51,7 @@ function App() {
   // Function to mark a task as completed
   const completeTask = async (taskId) => {
     try {
-      const response = await axios.put(`/tasks/${taskId}`);
+      const response = await axios.put(`${apiBaseUrl}/tasks/${taskId}`);
       setTasks(
         tasks.map((task) =>
           task.id === taskId ? { ...task, completed: true } : task
