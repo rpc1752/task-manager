@@ -4,10 +4,25 @@ import TaskList from "./components/TaskList";
 import TaskForm from "./components/TaskForm";
 
 // Get the API URL from environment variables or use the local proxy
-const apiBaseUrl =
-  import.meta.env.PROD && import.meta.env.VITE_API_URL
-    ? import.meta.env.VITE_API_URL
-    : "";
+const getApiBaseUrl = () => {
+  // Production with explicit API URL set in environment
+  if (import.meta.env.PROD && import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+
+  // Netlify deployment with /api proxy
+  if (
+    import.meta.env.PROD &&
+    window.location.hostname.includes("netlify.app")
+  ) {
+    return "/api";
+  }
+
+  // Local development - use the proxy configured in vite.config.js
+  return "";
+};
+
+const apiBaseUrl = getApiBaseUrl();
 
 function App() {
   const [tasks, setTasks] = useState([]);

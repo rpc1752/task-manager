@@ -78,11 +78,13 @@ task-manager/
 - Add a new task
 - Mark a task as completed
 
-## Deploying to Render
+## Deployment Options
+
+### Deploying to Render
 
 This application is configured for easy deployment to [Render](https://render.com).
 
-### Deploying with a Blueprint
+#### Using Render Blueprints
 
 1. Fork or clone this repository to your GitHub account.
 
@@ -103,11 +105,9 @@ This application is configured for easy deployment to [Render](https://render.co
 
 8. Render will deploy both services and provide URLs for each.
 
-### Manual Deployment
+#### Manual Deployment on Render
 
-If you prefer to deploy the services manually:
-
-#### Backend Deployment
+##### Backend Deployment
 
 1. In your Render dashboard, click "New Web Service".
 
@@ -116,14 +116,15 @@ If you prefer to deploy the services manually:
 3. Configure the service:
 
    - Name: task-manager-backend
-   - Build Command: `cd backend && echo "Building backend..."`
-   - Start Command: `cd backend && python main.py`
+   - Root Directory: backend
+   - Build Command: `echo "Building backend..."`
+   - Start Command: `python main.py`
    - Environment Variables:
      - `PYTHON_VERSION`: 3.9.0
 
 4. Click "Create Web Service".
 
-#### Frontend Deployment
+##### Frontend Deployment
 
 1. In your Render dashboard, click "New Static Site".
 
@@ -132,20 +133,57 @@ If you prefer to deploy the services manually:
 3. Configure the service:
 
    - Name: task-manager-frontend
-   - Build Command: `cd frontend && npm install && npm run build`
-   - Publish Directory: `frontend/dist`
+   - Root Directory: frontend
+   - Build Command: `npm install && npm run build`
+   - Publish Directory: dist
    - Environment Variables:
      - `NODE_VERSION`: 16
      - `API_URL`: (URL of your backend service)
 
 4. Click "Create Static Site".
 
+### Deploying to Netlify (Alternative)
+
+This app can also be deployed to Netlify using the included `netlify.toml` configuration.
+
+1. Deploy the backend to Render first using the instructions above.
+
+2. Create a Netlify account or sign in to your existing account.
+
+3. In your Netlify dashboard, click "New site from Git".
+
+4. Connect your GitHub account and select the repository.
+
+5. Netlify will automatically detect the `netlify.toml` configuration.
+
+6. Update the `netlify.toml` file to point to your Render backend URL:
+
+   ```
+   [[redirects]]
+     from = "/api/*"
+     to = "https://your-backend-url.onrender.com/:splat"
+     status = 200
+   ```
+
+7. Click "Deploy site".
+
 ## Troubleshooting
+
+### Deployment Issues
+
+1. **Package.json not found error**:
+
+   - Make sure the root directory is correctly specified in the deployment configuration.
+   - For Render, check that `rootDir` is set to the correct path in `render.yaml`.
+
+2. **API Connectivity Issues**:
+   - Ensure the `API_URL` environment variable is correctly set for the frontend.
+   - Check that CORS is properly configured in the backend.
 
 ### CORS Issues
 
 If you encounter CORS issues:
 
-1. Ensure the backend is running on port 8000
-2. Make sure the frontend is configured to proxy requests to the backend (already set up in vite.config.js)
-3. If issues persist, the CORS headers may need to be adjusted in the backend's main.py
+1. Ensure the backend is running on the expected port
+2. Make sure the frontend is properly configured to access the backend
+3. Check that the CORS headers in the backend's main.py allow requests from your frontend domain

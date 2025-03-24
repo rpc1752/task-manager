@@ -3,8 +3,9 @@ services:
   - type: web
     name: task-manager-backend
     env: python
-    buildCommand: cd backend && python -c "print('Building backend...')"
-    startCommand: cd backend && python main.py
+    rootDir: backend
+    buildCommand: python -c "print('Building backend...')"
+    startCommand: python main.py
     healthCheckPath: /
     envVars:
       - key: PYTHON_VERSION
@@ -14,8 +15,9 @@ services:
   - type: web
     name: task-manager-frontend
     env: static
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: ./frontend/dist
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
     envVars:
       - key: NODE_VERSION
         value: 16

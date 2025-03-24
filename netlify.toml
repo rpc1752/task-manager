@@ -1,0 +1,19 @@
+[build]
+  # Directory with the frontend code
+  base = "frontend"
+  # Command to build the frontend
+  command = "npm install && npm run build"
+  # Directory with the built files
+  publish = "dist"
+
+[[redirects]]
+  # Redirect API requests to the backend service
+  from = "/api/*"
+  to = "https://task-manager-backend.onrender.com/:splat"
+  status = 200
+
+[[redirects]]
+  # Handle SPA routing
+  from = "/*"
+  to = "/index.html"
+  status = 200 
